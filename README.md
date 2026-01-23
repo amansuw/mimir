@@ -1,0 +1,2 @@
+# mimir
+Jira summarizer
