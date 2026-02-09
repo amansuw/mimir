@@ -52,7 +52,7 @@ def full_summary_request(messages):
         return call_groq(messages, model=GROQ_MODEL_FULL, max_tokens=4096)
     except requests.exceptions.HTTPError as e:
         if e.response.status_code == 429:
-            print(f"  ⚠️  Rate limited on {GROQ_MODEL_FULL}, trying {GROQ_MODEL_QUICK}...")
+            print(f"  ⚠️  Rate limited on {GROQ_MODEL_FULL}, trying openai/gpt-oss-120b...")
             time.sleep(1)
-            return call_groq(messages, model=GROQ_MODEL_QUICK, max_tokens=4096)
+            return call_groq(messages, model="openai/gpt-oss-120b", max_tokens=4096)
         raise

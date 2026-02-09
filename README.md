@@ -15,9 +15,9 @@ Pull all your Jira activity (issues, comments, worklogs, changelog) and store it
    - `JIRA_API_TOKEN` - Generate at https://id.atlassian.com/manage-profile/security/api-tokens
    - `JIRA_USERNAME` - Your Jira username (used in JQL queries)
    - `START_DATE` - Start date for data extraction (YYYY-MM-DD)
-   - `GROQ_API_KEY` - Your Groq API key for LLM summarization
-   - `GROQ_MODEL_PRIMARY` - Primary model (default: `llama-3.1-8b-instant`)
-   - `GROQ_MODEL_FALLBACK` - Fallback model (default: `llama-3.3-70b-versatile`)
+   - `GROQ_API_KEY` - Generate at https://console.groq.com/keys
+   - `GROQ_MODEL_QUICK` - Fast model for per-issue summaries (default: `llama-3.1-8b-instant`)
+   - `GROQ_MODEL_FULL` - Larger model for feature summaries and final review (default: `llama-3.3-70b-versatile`)
 
 3. **Install dependencies:**
    ```bash
@@ -137,10 +137,16 @@ The script automatically generates summaries using Groq's LLM API:
    - Impact Statement
 
 **Model Strategy:**
-- **Primary:** `llama-3.1-8b-instant` (fast, high daily limit)
-- **Fallback:** `groq/compound-mini` (used when rate-limited)
 
-The script automatically handles rate limiting with 2-second delays between requests and falls back to alternative models when needed.
+Two models are used depending on the task:
+
+| Task | Primary Model | Fallback (on 429 rate limit) |
+|------|--------------|-----------------------------|
+| Per-issue summaries | `GROQ_MODEL_QUICK` (`llama-3.1-8b-instant`) | `groq/compound-mini` |
+| Feature summaries | `GROQ_MODEL_FULL` (`llama-3.3-70b-versatile`) | `openai/gpt-oss-120b` |
+| Final review | `GROQ_MODEL_FULL` (`llama-3.3-70b-versatile`) | `openai/gpt-oss-120b` |
+
+The script automatically handles rate limiting with 2-second delays between requests. On a 429 rate-limit error, each request automatically retries once with its fallback model.
 
 ## JQL Query Used
 
@@ -156,7 +162,7 @@ This matches Jira's "Worked on" view for comprehensive activity tracking. Issues
 ## Features
 
 - **Automatic Rate Limiting:** 2-second delays between API requests to respect Groq's 30 RPM limit
-- **Smart Model Fallback:** Automatically switches to `groq/compound-mini` when rate-limited
+- **Smart Model Fallback:** Automatically retries with a fallback model on 429 rate-limit errors
 - **Fresh Extraction:** Clears existing data before each extraction to ensure clean state
 - **Comprehensive JQL:** Matches Jira's "Worked on" view with 5 different user role filters
 - **Feature-Based Grouping:** Groups issues by actual features/products (not Jira boards)

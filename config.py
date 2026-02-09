@@ -21,8 +21,8 @@ END_DATE = os.getenv("END_DATE", "")  # Empty means "now"
 
 # Groq LLM Configuration
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-GROQ_MODEL_QUICK = os.getenv("GROQ_MODEL_PRIMARY", "llama-3.1-8b-instant")
-GROQ_MODEL_FULL = os.getenv("GROQ_MODEL_FALLBACK", "llama-3.3-70b-versatile")
+GROQ_MODEL_QUICK = os.getenv("GROQ_MODEL_QUICK", "llama-3.1-8b-instant")
+GROQ_MODEL_FULL = os.getenv("GROQ_MODEL_FULL", "llama-3.3-70b-versatile")
 
 # Output directories
 OUTPUT_DIR = Path("output")
